@@ -104,8 +104,8 @@ sudo apt update
 sudo apt install -y nodejs npm git
 
 # Clone
-git clone https://github.com/<your-username>/<your-repo>.git
-cd <your-repo>
+git clone https://github.com/Faze-Creepre/F680.git
+cd F680
 npm install
 
 # Keep it running forever with PM2
